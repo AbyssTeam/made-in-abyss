@@ -16,35 +16,44 @@ function expand (arr, amt) {
             let x2 = arr[i+1][0];
             let y2 = arr[i+1][1];
             let v2 = [x2 - x, y2 - y];
-            let mag2 = v2[0]*v2[0] + v2[1]*v2[1];
+            let mag2 = Math.sqrt(v2[0]*v2[0] + v2[1]*v2[1]);
             let v3 = [-v2[1]/mag2, v2[2]/mag2];
+
             out.push([x+v3[0]*amt, y+v3[1]*amt])
         }
         else if (i == end-1) {
             let x0 = arr[i-1][0];
             let y0 = arr[i-1][1];
-            let v0 = [x0 - x, y0 - y];
-            let mag0 = v0[0]*v0[0] + v0[1]*v0[1];
+            let v0 = [x - x0, y - y0];
+            let mag0 = Math.sqrt(v0[0]*v0[0] + v0[1]*v0[1]);
             let v3 = [-v0[1]/mag0, v0[2]/mag0];
+
+
+
             out.push([x+v3[0]*amt, y+v3[1]*amt])
         }
         else {
             let x2 = arr[i+1][0];
             let y2 = arr[i+1][1];
             let v2 = [x2 - x, y2 - y];
-            let mag2 = v2[0]*v2[0] + v2[1]*v2[1];
+            let mag2 = Math.sqrt(v2[0]*v2[0] + v2[1]*v2[1]);
 
             let x0 = arr[i-1][0];
             let y0 = arr[i-1][1];
-            let v0 = [x0 - x, y0 - y];
-            let mag0 = v0[0]*v0[0] + v0[1]*v0[1];
+            let v0 = [x - x0, y - y0];
+            let mag0 = Math.sqrt(v0[0]*v0[0] + v0[1]*v0[1]);
 
-            let v3 = [-v0[1]/mag0/2 - v2[1]/mag2/2,
-                    v0[0]/mag0/2 + v2[0]/mag2/2];
-            out.push([x+v3[0]*amt, y+v3[1]*amt])
+            //let d02 = Math.sqrt((x2-x0)*(x2-x0) + (x2-x))
+            let vl = [-v0[1]/mag0, v0[0]/mag0];
+            let vr = [-v2[1]/mag2, v2[0]/mag2];
+            let v3 = [vl[0]+vr[0], vl[1]+vr[1]];
+            let mag3 = Math.sqrt(v3[0]*v3[0] + v3[1]*v3[1]);
+
+
+            out.push([x+v3[0]/mag3*amt, y+v3[1]/mag3*amt])
         }
     }
-    return out;
+    return smoothPath(out);
 };
 function generate(fn, num) {
     let out = [];
@@ -66,8 +75,10 @@ function addPath(path) {
         randomSprite.body.static = true;
         randomSprite.body.rotation = Math.atan((y2-y1) / (x2-x1));
     }
-
 }
+
+
+
 function create () {
     game.stage.backgroundColor = "fff";
 
@@ -87,10 +98,15 @@ function create () {
     line.body.addRectangle(100, 1);*/
     let amt = 100;
     let path = generate((i)=>{return [
-        Math.cos(Math.PI/30*i) * 40 + 200,
+        Math.cos(Math.PI/30*i) * 100 + 200,
         i * 5]
     }, amt);
     addPath(path);
+    let path2 = generate((i)=>{return [
+        Math.cos(Math.PI/30*i) * 100 + 500,
+        i * 5]
+    }, amt);
+    addPath(path2);
 }
 
 function update() {
